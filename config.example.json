@@ -1,0 +1,10 @@
+{
+    "thresholds": {
+        "cpu": 80,
+        "memory": 90,
+        "disk": 80
+    },
+    "interval": 3,
+    "disk_path": "/",
+    "log_file": "logs/monitor.log"
+}
