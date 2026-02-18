@@ -60,7 +60,7 @@ nohup python monitor.py > monitor.log 2>&1 &
 ——————————————————————————————————————————————————
 ⭐️Quick Start Guide
 1. Clone the repository bash
-git clone https://github.com/y114514-zero/system-monitor.git
+git clone https://github.com/y114514-zero/Simple-system-detection-and-alerting---Linux.git
 cd system-monitor
 
 2. Installing Dependencies
@@ -105,6 +105,7 @@ Configured as a systemd service (Linux): Refer to the example service file (if p
 6. Stop Monitoring
 If it is running on the front end, simply press Ctrl+C to stop. 
 If it is running in the background, use the command "ps aux | grep monitor.py" to find the process ID and then kill it.
+
 
 
 
