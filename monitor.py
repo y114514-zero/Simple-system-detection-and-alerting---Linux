@@ -13,6 +13,7 @@ import psutil
 import requests
 import datetime
 import time
+import pymysql
 from dotenv import load_dotenv
 
 # 加载./env的值
@@ -30,15 +31,36 @@ load_dotenv()
 with open('config.json', 'r', encoding='utf-8') as f:
     config = json.load(f)
 
-# 从配置中获取值
+# 从配置中获取值mon
 THRESHOLDS = config['thresholds']
 CPU_MAXUSE = THRESHOLDS['cpu']
 MEMORY_MAXUSE = THRESHOLDS['memory']
 DISK_MAXUSE = THRESHOLDS['disk']
+MYSQL_CONN = config.get('mysql')
 INTERVAL = config.get('interval', 3)  # 默认3秒获取一次信息
 DISK_PATH = config.get('disk_path', '/')
 LOG_PATH = config.get('log_file', 'logger_daily.log')  # 获取定义的log存放位置
+ALTER_INTERVAL = config.get('alter_interval', 10)  # 添加告警间隔，默认10s能秒
 URL = os.getenv('url')  # 从环境变量读取
+
+# 获取配置文件的mysql参数
+if MYSQL_CONN:
+    conn = pymysql.connect(
+        host=MYSQL_CONN['host'],
+        user=MYSQL_CONN['user'],
+        port=MYSQL_CONN['port'],
+        password=MYSQL_CONN['password'],
+        database=MYSQL_CONN['database'],
+        charset='utf8mb4'
+    )
+    cursor = conn.cursor()
+
+# 告警初始化（字典）
+last_alter_dev = {
+    'cpu': 0.0,
+    'free': 0.0,
+    'disk': 0.0
+}
 
 # 检查必要的配置是否存在
 if not URL:
@@ -67,22 +89,32 @@ def log_alter(system_time, resource, use):
 
 # 定义使用率告警
 def use_alter():
+    connect_time = time.time()  # 获取当前时间
+
     system_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     # 获取CPU、内存、磁盘使用率
     cpu_use = psutil.cpu_percent(interval=1)
     if cpu_use >= CPU_MAXUSE:
-        print(f'CPU使用率超过阈值{CPU_MAXUSE}%,当前使用率{cpu_use}%')
-        log_alter(system_time, 'CPU', CPU_MAXUSE)
+        # 如果当前时间减去上次cpu执行的时间间隔大于告警时间间隔，就会执行以下语句
+        if connect_time - last_alter_dev['cpu'] >= ALTER_INTERVAL:
+            print(f'CPU使用率超过阈值{CPU_MAXUSE}%,当前使用率{cpu_use}%')
+            log_alter(system_time, 'CPU', CPU_MAXUSE)
+            # 最后一次cpu时间继承当前时间
+            last_alter_dev['cpu'] = connect_time
 
     free_use = psutil.virtual_memory().percent
     if free_use >= MEMORY_MAXUSE:
-        print(f'内存使用率超过阈值{MEMORY_MAXUSE}%,当前使用率{free_use}%')
-        log_alter(system_time, '内存', MEMORY_MAXUSE)
+        if connect_time - last_alter_dev['free'] >= ALTER_INTERVAL:
+            print(f'内存使用率超过阈值{MEMORY_MAXUSE}%,当前使用率{free_use}%')
+            log_alter(system_time, '内存', MEMORY_MAXUSE)
+            last_alter_dev['free'] = connect_time
 
     disk_use = psutil.disk_usage(DISK_PATH).percent
     if disk_use >= DISK_MAXUSE:
-        print(f'磁盘使用率超过阈值{DISK_MAXUSE}%,当前使用率{disk_use}%')
-        log_alter(system_time, '磁盘', DISK_MAXUSE)
+        if connect_time - last_alter_dev['disk'] >= ALTER_INTERVAL:
+            print(f'磁盘使用率超过阈值{DISK_MAXUSE}%,当前使用率{disk_use}%')
+            log_alter(system_time, '磁盘', DISK_MAXUSE)
+            last_alter_dev['disk'] = connect_time
 
     # 求磁盘读写IO次数与时间与网络接收发送字节
     disk_io1 = psutil.disk_io_counters()
@@ -109,6 +141,20 @@ def use_alter():
         f'当前时间{system_time}       CPU使用率{cpu_use}%    内存使用率{free_use}%     磁盘使用率{disk_use}%       磁盘读写{disk_io_read:.1f}MB/s {disk_io_write:.1f}MB/s    次数{disk_io_read_count}  {disk_io_write_count}'
         f'    网络发送字节为{network_send_b}Mb/s 接受字节为{network_resv_b}Mb/s')
     logger_alter(system_time, cpu_use, free_use, disk_use)
+
+    # 插入数据
+    if MYSQL_CONN:
+        sql = """
+            insert into metrics 
+            (timestamp, cpu_usage, memory_usage, disk_usage, disk_read_mb, disk_write_mb, disk_read_count,
+            disk_write_count, net_sent_mb, net_resv_mb)
+            values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        cursor.execute(sql, (
+            system_time, cpu_use, free_use, disk_use, disk_io_read, disk_io_write, disk_io_read_count,
+            disk_io_write_count
+            , network_send_b, network_resv_b))
+        conn.commit()
 
 
 def logger_alter(system_time, cpu, free, disk):

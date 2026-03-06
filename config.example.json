@@ -4,7 +4,15 @@
         "memory": 90,
         "disk": 80
     },
+	"mysql": {
+		"host": "localhost[customize]",
+		"user": "youruser[customize]",
+		"password": "yourpassword[customize]"
+		"database": "system_monitor[customize]"
+		"port": 3306
+	},
     "interval": 3,
+	"alter_interval": 5,
     "disk_path": "/",
     "log_file": "logs/monitor.log"
 }
