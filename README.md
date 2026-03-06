@@ -2,7 +2,7 @@
 - **实时系统监控**：持续采集 CPU、内存、磁盘空间的使用率。
 - **阈值告警**：可以通过配置文件自定义 CPU、内存、磁盘的告警阈值，超过阈值即会发送通知。
 - **多指标采集**：监控磁盘读写速率（MB/s）与 I/O 次数，以及网络发送/接收速率（Mb/s）。
-- 日志记录：将关键指标自动写入本地日志文件，方便分析。
+- 日志记录：将关键指标自动写入本地日志文件和MySQL数据库中，方便分析。
 
 - 自动配置：首次运行自动创建配置文件模板（.env 和 config.json），用户只需填写 Webhook 地址即可使用。
 
@@ -105,13 +105,20 @@ nohup python monitor.py > monitor.log 2>&1 &
 
 如果是后台运行，使用 ps aux | grep monitor.py 找到进程 ID 并 kill 它。
 
+**更新日志**
+[v1.10]
+- 新增 MySQL 数据持久化功能，监控数据可存入数据库。
+- 新增数据库初始化脚本 `init_db.sql`和`MySQL一键部署脚本`。
+- 更新配置文件示例 `config.example.json`，增加 `mysql` 配置项。
+- 修复磁盘 I/O 计算错误。
+
 ——————————————————————————————————————————————————
 
 # ✨ Key Functionality 
 - Real-time system monitoring: Continuously collect the usage rates of CPU, memory, and disk space.
 - Threshold alerts: Thresholds for CPU, memory, and disk can be customized through configuration files, and notifications will be sent when the thresholds are exceeded.
 - Multi-indicator collection: Monitor disk read/write rates (MB/s) and I/O counts, as well as network sending/receiving rates (Mb/s).
-- Log recording: Key indicators are automatically written to local log files for easy analysis.
+- Log recording: Key indicators are automatically written to local log files and in the MySQL database for easy analysis.
 - Automatic configuration: Automatically create configuration file templates (.env and config.json) on the first run. Users only need to fill in the Webhook address to use it.
 - Cross-platform support: Based on Python and the psutil library, it can run on Linux, macOS, and Windows systems. 
 # 🛠️ Technology Stack 
@@ -157,7 +164,7 @@ cp config.example.json config.json
 
 Then, edit the config.json as needed, modifying the thresholds, log paths, etc. (the default values can usually be used directly). 
 Set Webhook URL:
-Simply run the script, and it will automatically detect and create the .env template: 
+Simply run the script, 和 it will automatically detect and create the .env template: 
 bash
 
 ```
@@ -185,4 +192,12 @@ nohup python monitor.py > monitor.log 2>&1 &
 
 ## 6. Stop Monitoring
 If it is running on the front end, simply press Ctrl+C to stop. 
+
 If it is running in the background, use the command "ps aux | grep monitor.py" to find the process ID and then kill it.
+
+**Update Log**
+[v1.10]
+- Added MySQL data persistence feature, allowing monitored data to be stored in the database.
+- Added database initialization script `init_db.sql` and the "MySQL one-click deployment script".
+- Updated configuration file example `config.example.json`, adding `mysql` configuration item.
+- Fixed disk I/O calculation error.
