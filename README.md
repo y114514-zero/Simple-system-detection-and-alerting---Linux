@@ -17,6 +17,7 @@
 - `psutil`：用于采集系统资源信息。
 - `requests`：用于发送 HTTP 告警请求。
 - `python-dotenv`：用于管理环境变量配置文件。
+- `pymysql`：用于实现python调用MySQL数据库参数。
 - 配置格式：JSON (config.json) 与环境变量文件 (.env)
 
 
@@ -46,8 +47,18 @@ source venv/bin/activate   # Linux/Mac
 ```properties
 pip install -r requirements.txt
 ```
+## 3. 安装MySQL并初始化
+若没有，就执行MySQL一键部署脚本，并将init_db.sql初始化数据库导入到MySQL中
+bash
 
-## 3. 配置
+```properties
+source mysql一键部署.sh
+systemctl start mysqld
+systemctl enable mysqld
+mysql < init_db.sql -pyourpassword
+```
+
+## 4. 配置
 配置文件示例config.example.json：
 
 bash
@@ -76,7 +87,7 @@ text
 
 text
 url=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxxxxx
-## 4. 运行监控
+## 5. 运行监控
 再次运行脚本：
 
 bash
@@ -88,7 +99,7 @@ python monitor.py
 脚本会开始采集系统指标，并在终端实时显示。当 CPU、内存或磁盘使用率超过阈值时，会自动通过 Webhook 发送告警消息。
 
 
-## 5. 后台运行（可选）
+## 6. 后台运行（可选）
 如果希望脚本在后台持续运行，可以使用以下方法：
 
 使用 nohup：
@@ -100,7 +111,7 @@ nohup python monitor.py > monitor.log 2>&1 &
 ```
 
 
-## 6. 停止监控
+## 7. 停止监控
 如果是在前台运行，按 Ctrl+C 即可停止。
 
 如果是后台运行，使用 ps aux | grep monitor.py 找到进程 ID 并 kill 它。
@@ -115,8 +126,8 @@ nohup python monitor.py > monitor.log 2>&1 &
 ——————————————————————————————————————————————————
 
 # ✨ Key Functionality 
-- Real-time system monitoring: Continuously collect the usage rates of CPU, memory, and disk space.
-- Threshold alerts: Thresholds for CPU, memory, and disk can be customized through configuration files, and notifications will be sent when the thresholds are exceeded.
+- Real-time system monitoring: Continuously collect the usage rates of CPU, memory, 和 disk space.
+- Threshold alerts: Thresholds for CPU, memory, 和 disk can be customized through configuration files, 和 notifications will be sent when the thresholds are exceeded.
 - Multi-indicator collection: Monitor disk read/write rates (MB/s) and I/O counts, as well as network sending/receiving rates (Mb/s).
 - Log recording: Key indicators are automatically written to local log files and in the MySQL database for easy analysis.
 - Automatic configuration: Automatically create configuration file templates (.env and config.json) on the first run. Users only need to fill in the Webhook address to use it.
@@ -127,6 +138,7 @@ nohup python monitor.py > monitor.log 2>&1 &
 - `psutil`: Used for collecting system resource information.
 - `requests`: Used for sending HTTP alert requests.
 - `python-dotenv`: Used for managing environment variable configuration files.
+- `pymysql`: Used for enable Python to interact with the MySQL database parameters.
 - Configuration format: JSON (config.json) and environment variable file (.env)
 
 
@@ -153,8 +165,19 @@ bash
 pip install -r requirements.txt
 ```
 
+## 3. Install MySQL and Initialize
+If it is not already installed, execute the MySQL one-click deployment script and import the init_db.sql initialization script into MySQL.
 
-## 3. Configuration
+bash
+
+```properties
+source mysql一键部署.sh
+systemctl start mysqld
+systemctl enable mysqld
+mysql < init_db.sql -pyourpassword
+```
+
+## 4. Configuration
 Configuration file example: config.example.json: 
 bash
 
@@ -178,19 +201,19 @@ At this point, edit the generated .env file and enter the Webhook address of you
 text
 url=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxxxxx
 
-## 4. Operation Monitoring
+## 5. Operation Monitoring
 Run the script again: 
 bash
 python monitor.py
 The script will start collecting system metrics and display them in real time on the terminal. When the CPU, memory or disk usage exceeds the threshold, an alert message will be automatically sent via Webhook.
 
-## 5. Running in the background (optional)
+## 6. Running in the background (optional)
 If you want the script to run continuously in the background, you can use the following method: 
 Using nohup: 
 bash
 nohup python monitor.py > monitor.log 2>&1 &
 
-## 6. Stop Monitoring
+## 7. Stop Monitoring
 If it is running on the front end, simply press Ctrl+C to stop. 
 
 If it is running in the background, use the command "ps aux | grep monitor.py" to find the process ID and then kill it.
@@ -201,3 +224,4 @@ If it is running in the background, use the command "ps aux | grep monitor.py" t
 - Added database initialization script `init_db.sql` and the "MySQL one-click deployment script".
 - Updated configuration file example `config.example.json`, adding `mysql` configuration item.
 - Fixed disk I/O calculation error.
+
