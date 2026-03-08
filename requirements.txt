@@ -1,4 +1,5 @@
 psutil==5.8.0
 requests==2.25.1
 python-dotenv==1.2.1
-pymsql==1.1.2
+
+pymysql==1.1.2
