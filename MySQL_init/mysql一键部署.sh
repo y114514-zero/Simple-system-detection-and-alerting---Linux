@@ -16,7 +16,7 @@ mkdir -p /export/server/
 #2. 判断根目录是否有mysql压缩包,有就解压并重命名
 if [ -f /root/mysql-8.0.40-linux-glibc2.28-x86_64.tar.xz ]; then
     echo "检测到有压缩包，执行解压操作..."
-    tar -xvf mysql-8.0.40-linux-glibc2.28-x86_64.tar.xz -C /export/server/
+    tar -xvf /root/mysql-8.0.40-linux-glibc2.28-x86_64.tar.xz -C /export/server/
     cd /export/server/
     ls -l
     mv mysql-8.0.40-linux-glibc2.28-x86_64 mysql 
