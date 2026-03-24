@@ -1,0 +1,53 @@
+- name: 确保Prometheus不存在
+  file:
+    path: /usr/local/prometheus
+    state: absent
+
+
+- name: 下载Prometheus
+  get_url: 
+    url: https://github.com/y114514-zero/Prometheus-GraFana_Tools/releases/download/v1.0/prometheus-2.51.2.linux-amd64.tar.gz
+    dest: /tmp/prometheus.tar.gz
+
+- name: 解压 Prometheus 到 /usr/local
+  unarchive:
+    src: /tmp/prometheus.tar.gz
+    dest: /usr/local
+    remote_src: yes
+
+- name: 重命名
+  shell: "mv /usr/local/prometheus-2.51.2.linux-amd64 /usr/local/prometheus"
+
+- name: 配置文件
+  template:
+    src: prometheus.yaml.j2
+    dest: /usr/local/prometheus/prometheus.yml
+    mode: 0755
+
+- name: 创建Prometheus服务
+  template:
+    src: prometheus.service.j2
+    dest: /etc/systemd/system/prometheus.service
+
+- name: 启动服务
+  service:
+    name: prometheus
+    state: started
+    enabled: yes
+
+- name: 安装Grafana
+  get_url:
+    url: https://github.com/y114514-zero/Prometheus-GraFana_Tools/releases/download/v1.0/grafana-enterprise-10.4.2-1.x86_64.rpm
+    dest: /tmp/grafana.rpm
+
+- name: 安装Grafana包
+  dnf:
+    name: /tmp/grafana.rpm
+    state: present
+    disable_gpg_check: yes
+
+- name: 启动服务
+  service:
+    name: grafana-server
+    state: started
+    enabled: yes

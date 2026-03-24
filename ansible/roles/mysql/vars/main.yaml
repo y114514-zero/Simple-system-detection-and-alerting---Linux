@@ -1,0 +1,4 @@
+# 定义mysql的密码
+mysql_password: "your_password"
+# 项目的路径
+path: "your_path"

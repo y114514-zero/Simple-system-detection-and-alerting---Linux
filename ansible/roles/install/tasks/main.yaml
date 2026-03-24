@@ -1,0 +1,24 @@
+# 该文档用以下载Linux的Python环境及该项目必要依赖包
+- name: 下载python环境
+  dnf:
+    name: python3,python-pip
+    state: present
+
+- name: 下载依赖包
+  shell:
+    "cd /{{path}}/Simple-system-detection-and-alerting---Linux && pip install -r requirements.txt"
+
+- name: 将templates中的服务文件添加到systemd中
+  template:
+    src: monitor.service.j2
+    dest: /etc/systemd/system/monitor.service
+  notify: restart monitor
+
+- name: 将配置重命名
+  shell: "mv /{{path}}/Simple-system-detection-and-alerting---Linux/config.example.json /{{path}}/Simple-system-detection-and-alerting---Linux/config.json && mv /{{path}}/Simple-system-detection-and-alerting---Linux/.env.example /{{path}}/Simple-system-detection-and-alerting---Linux/.env"
+
+- name: 启动服务
+  service:
+    name: monitor
+    state: started
+    enabled: yes

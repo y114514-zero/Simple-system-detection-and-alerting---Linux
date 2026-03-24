@@ -1,0 +1,12 @@
+# 将脚本封装为服务项
+
+[Unit]
+Description=System Monitor
+After=network.target
+
+[Service]
+ExecStart=/root/Simple-system-detection-and-alerting---Linux/monitor.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

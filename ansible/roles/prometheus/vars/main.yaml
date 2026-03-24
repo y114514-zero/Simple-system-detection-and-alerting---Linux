@@ -1,0 +1,3 @@
+# 你要监控的主机
+monitor_host: "localhost"
+path: "your_path"

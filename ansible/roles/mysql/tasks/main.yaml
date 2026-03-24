@@ -1,0 +1,19 @@
+- name: 初始化数据库
+  shell: "/export/server/mysql/bin/mysql < /{{path}}/Simple-system-detection-and-alerting---Linux/ansible/roles/mysql/files/init_db.sql -pyour_password"
+
+- name: 创建用户
+  mysql_user:
+    name: monitorer
+    password: "{{mysql_password}}"
+    priv: "system_monitor.*:ALL"
+    state: present
+    host: "localhost"
+    login_password: "{{mysql_password}}"
+  notify: restart mysql
+
+- name: 启动服务
+  service:
+    name: mysqld
+    state: restarted
+    enabled: yes
+  
