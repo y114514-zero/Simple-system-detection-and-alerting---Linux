@@ -5,10 +5,10 @@
         "disk": 80
     },
 	"mysql": {
-		"host": "localhost[customize]",
-		"user": "youruser[customize]",
-		"password": "yourpassword[customize]",
-		"database": "system_monitor[customize]",
+		"host": "localhost[your_host]",
+		"user": "monitorer[default]",
+		"password": "123456",
+		"database": "system_monitor[default]",
 		"port": 3306
 	},
     "interval": 3,
