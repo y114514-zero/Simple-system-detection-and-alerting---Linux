@@ -2,3 +2,5 @@ psutil==5.8.0
 requests==2.25.1
 python-dotenv==1.2.1
 pymysql==1.1.2
+prometheus_client
+cryptography
