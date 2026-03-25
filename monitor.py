@@ -1,11 +1,3 @@
-"""
-思路：
-    1.导入模块：psutil、time、datetime、request
-    2.定义定时查询函数
-    3.定义requests函数
-    4.定义报警函数
-"""
-
 # 导入模块
 import json
 import os
@@ -14,6 +6,7 @@ import requests
 import datetime
 import time
 import pymysql
+import prometheus_client
 from dotenv import load_dotenv
 
 # 加载./env的值
@@ -33,18 +26,34 @@ with open('config.json', 'r', encoding='utf-8') as f:
 
 # 从配置中获取值mon
 THRESHOLDS = config['thresholds']
-CPU_MAXUSE = THRESHOLDS['cpu']
-MEMORY_MAXUSE = THRESHOLDS['memory']
-DISK_MAXUSE = THRESHOLDS['disk']
 MYSQL_CONN = config.get('mysql')
 INTERVAL = config.get('interval', 3)  # 默认3秒获取一次信息
 DISK_PATH = config.get('disk_path', '/')
 LOG_PATH = config.get('log_file', 'logger_daily.log')  # 获取定义的log存放位置
 ALTER_INTERVAL = config.get('alter_interval', 10)  # 添加告警间隔，默认10s能秒
+CPU_MAXUSE = THRESHOLDS['cpu']
+MEMORY_MAXUSE = THRESHOLDS['memory']
+DISK_MAXUSE = THRESHOLDS['disk']
 URL = os.getenv('url')  # 从环境变量读取
 
+# ==========================================定义Prometheus对象==========================================
+cpu_use_gauge = prometheus_client.Gauge("CPU_use_percent", "CPU的使用率")
+free_use_gauge = prometheus_client.Gauge("Free_use_percent", "内存使用率")
+disk_use_gauge = prometheus_client.Gauge("Disk_use_percent", "磁盘使用率")
+disk_read_gauge = prometheus_client.Gauge("Disk_read_MB", "磁盘读取数")
+disk_write_gauge = prometheus_client.Gauge("Disk_write_MB", "磁盘写入数")
+network_send_gauge = prometheus_client.Gauge("Network_send_Mb", "网络发送字节数")
+network_resv_gauge = prometheus_client.Gauge("Network_resv_Mb", "网络接受字节数")
+
+# 设置端口号
+prometheus_client.start_http_server(8000)
+print("Prometheus used port8000")
+# ==========================================定义Prometheus对象==========================================
+
+# ==========================================定义MySQL==========================================
 # 获取配置文件的mysql参数
 if MYSQL_CONN:
+    # 与数据库建立连接
     conn = pymysql.connect(
         host=MYSQL_CONN['host'],
         user=MYSQL_CONN['user'],
@@ -53,7 +62,8 @@ if MYSQL_CONN:
         database=MYSQL_CONN['database'],
         charset='utf8mb4'
     )
-    cursor = conn.cursor()
+    cursor = conn.cursor()  # 创建游标对象
+# ==========================================定义MySQL==========================================
 
 # 告警初始化（字典）
 last_alter_dev = {
@@ -87,7 +97,7 @@ def log_alter(system_time, resource, use):
         print('没发送过去')
 
 
-# 定义使用率告警
+# ==========================================定义使用率告警==========================================
 def use_alter():
     connect_time = time.time()  # 获取当前时间
 
@@ -120,9 +130,11 @@ def use_alter():
     disk_io1 = psutil.disk_io_counters()
     time.sleep(1)
     disk_io2 = psutil.disk_io_counters()
+
     # 求写入IO次数及速率
     disk_io_write = (disk_io2.write_bytes - disk_io1.write_bytes) // 1000 ** 2
     disk_io_write_count = disk_io2.write_count - disk_io1.write_count
+
     # 求读出IO
     disk_io_read = (disk_io2.read_bytes - disk_io1.read_bytes) // 1000 ** 2
     disk_io_read_count = (disk_io2.read_count - disk_io1.read_count)
@@ -142,21 +154,41 @@ def use_alter():
         f'    网络发送字节为{network_send_b}Mb/s 接受字节为{network_resv_b}Mb/s')
     logger_alter(system_time, cpu_use, free_use, disk_use)
 
-    # 插入数据
+    # ==========================================更新Prometheus指标==========================================
+    cpu_use_gauge.set(cpu_use)
+    free_use_gauge.set(free_use)
+    disk_use_gauge.set(disk_use)
+    disk_read_gauge.set(disk_io_read)
+    disk_write_gauge.set(disk_io_write)
+    network_send_gauge.set(network_send_b)
+    network_resv_gauge.set(network_resv_b)
+    # ==========================================更新Prometheus指标==========================================
+
+    # ==========================================插入数据==========================================
     if MYSQL_CONN:
         sql = """
             insert into metrics 
             (timestamp, cpu_usage, memory_usage, disk_usage, disk_read_mb, disk_write_mb, disk_read_count,
-            disk_write_count, net_sent_mb, net_resv_mb)
+            disk_write_count, net_send_mb, net_resv_mb)
             values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
+
+        # 执行修改参数
         cursor.execute(sql, (
             system_time, cpu_use, free_use, disk_use, disk_io_read, disk_io_write, disk_io_read_count,
             disk_io_write_count
             , network_send_b, network_resv_b))
-        conn.commit()
+
+        conn.commit()  # 用来确认更改
+
+        # 清理数据
+        if cursor.lastrowid % 127 == 0:
+            cursor.execute("TRUNCATE TABLE metrics")
+            conn.commit()
+            print("数据超过127条，执行清除")
 
 
+# ==========================================创建日志写入函数==========================================
 def logger_alter(system_time, cpu, free, disk):
     # 确保日志文件所在的目录存在
     log_dir = os.path.dirname(LOG_PATH)
@@ -167,10 +199,12 @@ def logger_alter(system_time, cpu, free, disk):
         file.write(f'当前时间{system_time}   CPU使用率{cpu}%    内存使用率{free}%     磁盘使用率{disk}% \t \n')
 
 
+# ==========================================程序入口==========================================
 if __name__ == '__main__':
     try:
         while True:
             use_alter()
             time.sleep(INTERVAL)
+
     except KeyboardInterrupt:
         print('采集结束')
