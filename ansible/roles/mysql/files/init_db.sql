@@ -11,7 +11,7 @@ create table if not exists metrics (
     disk_write_mb float,
     disk_read_count int,
     disk_write_count int,
-    net_sent_mb float,
+    net_send_mb float,
     net_resv_mb float,
     index idx_timestamp (timestamp)
 ) engine=InnoDB default charset=utf8mb4;
