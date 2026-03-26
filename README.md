@@ -116,7 +116,7 @@ nohup python monitor.py > monitor.log 2>&1 &
 
 如果是后台运行，使用 ps aux | grep monitor.py 找到进程 ID 并 kill 它。
 
-# 🚀 高级用法
+## 🚀 高级用法
 使用 Ansible 一键部署
 项目中包含 ansible/ 目录，可一键部署监控系统及其依赖（MySQL、Prometheus、Grafana）。详见 ansible/README.md。
 
@@ -227,7 +227,7 @@ nohup python monitor.py > monitor.log 2>&1 &
 ## 7.  Stop monitoring
 If it is running at the foreground, you can press Ctrl+C to stop it.
 If it's running in the background, use `ps aux | grep monitor.py` to find the process ID and kill it.
-# 🚀 Advanced Usage
+## 🚀 Advanced Usage
 One-click deployment using Ansible
 The project includes an ansible/ directory, which allows for one-click deployment of the monitoring system and its dependencies (MySQL, Prometheus, Grafana). For details, please refer to ansible/README.md.
 Integrate with Prometheus
