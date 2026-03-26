@@ -22,7 +22,7 @@ ansible/
 
 ## 📦 前置条件
 - **控制机**：已安装 Ansible。
-- **目标主机**：Linux 系统（支持 CentOS 7+/8+、Ubuntu 18.04+ 等），可 SSH 登录，且具有 sudo 权限。
+- **目标主机**：Linux 系统（支持 CentOS 7+/8+），可 SSH 登录，且具有 sudo 权限。
 - **网络**：目标主机需能访问互联网以下载软件包。
 
 ## ⚙️ 配置说明
@@ -87,7 +87,7 @@ ansible/
 ```
 ## 📦 Preconditions
 - **Control machine**: Ansible has been installed.
-- **Target Host**: Linux system (supporting CentOS 7+/8+, Ubuntu 18.04+, etc.), SSH login enabled, and with sudo privileges.
+- **Target Host**: Linux system (supporting CentOS 7+/8+), SSH login enabled, and with sudo privileges.
 - **Network**: The target host must be able to access the Internet to download software packages.
 ## ⚙️ Configuration instructions
 ### 1.  Edit the inventory of hosts
