@@ -130,6 +130,7 @@ scrape_configs:
       targets: ['localhost:8000']
 之后在 Grafana 中导入 Prometheus 数据源，即可展示实时图表。
 ——————————————————————————————————————————————————
+
 **更新日志**
 [v1.20]
 - 新增Prometheus 集成：引入 prometheus-client，通过 /metrics 端点暴露所有监控指标（CPU、内存、磁盘、网络 I/O），支持 Prometheus 原生抓取，实现云原生监控。
@@ -199,7 +200,7 @@ cp config.example.json config.json
 ```
 Then, edit config.json as needed, modifying the threshold, log path, etc. (Default values can usually be used directly).
 Set Webhook URL:
-Run the script directly, and it will automatically detect and create an .env template:
+Run the script directly, 和 it will automatically detect and create an .env template:
 bash
 ```properties
 python monitor.py
@@ -239,6 +240,7 @@ scrape_configs:
       - targets: ['localhost:8000']
 Afterwards, by importing the Prometheus data source into Grafana, real-time charts can be displayed.
 ——————————————————————————————————————————————————
+
 **Update Log**
 [v1.20]
 - Added Prometheus integration: Introduced prometheus-client to expose all monitoring metrics (CPU, memory, disk, network I/O) through the /metrics endpoint, supporting native Prometheus scraping for cloud-native monitoring.
