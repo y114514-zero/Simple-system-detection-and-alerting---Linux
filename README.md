@@ -124,10 +124,11 @@ nohup python monitor.py > monitor.log 2>&1 &
 脚本启动后会监听 8000 端口，提供 /metrics 接口。在 Prometheus 配置中添加：
 
 yaml
-scrape_configs:
+```scrape_configs:
   - job_name: 'system_monitor'
     static_configs:
       targets: ['localhost:8000']
+```
 之后在 Grafana 中导入 Prometheus 数据源，即可展示实时图表。
 ——————————————————————————————————————————————————
 
@@ -234,10 +235,11 @@ The project includes an ansible/ directory, which allows for one-click deploymen
 Integrate with Prometheus
 After the script is started, it will listen on port 8000 and provide the /metrics interface. Add the following to the Prometheus configuration:
 yaml
-scrape_configs:
+```scrape_configs:
   - job_name: 'system_monitor'
     static_configs:
       - targets: ['localhost:8000']
+```
 Afterwards, by importing the Prometheus data source into Grafana, real-time charts can be displayed.
 ——————————————————————————————————————————————————
 
