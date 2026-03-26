@@ -121,13 +121,13 @@ nohup python monitor.py > monitor.log 2>&1 &
 项目中包含 ansible/ 目录，可一键部署监控系统及其依赖（MySQL、Prometheus、Grafana）。详见 ansible/README.md。
 
 对接 Prometheus
-脚本启动后会监听 8000 端口，提供 /metrics 接口。在 Prometheus 配置中添加：
+脚本启动后会监听 8080 端口，提供 /metrics 接口。在 Prometheus 配置中添加：
 
 yaml
 ```scrape_configs:
   - job_name: 'system_monitor'
     static_configs:
-      targets: ['localhost:8000']
+      targets: ['localhost:8080']
 ```
 之后在 Grafana 中导入 Prometheus 数据源，即可展示实时图表。
 ——————————————————————————————————————————————————
@@ -233,12 +233,12 @@ If it's running in the background, use `ps aux | grep monitor.py` to find the pr
 One-click deployment using Ansible
 The project includes an ansible/ directory, which allows for one-click deployment of the monitoring system and its dependencies (MySQL, Prometheus, Grafana). For details, please refer to ansible/README.md.
 Integrate with Prometheus
-After the script is started, it will listen on port 8000 and provide the /metrics interface. Add the following to the Prometheus configuration:
+After the script is started, it will listen on port 8080 and provide the /metrics interface. Add the following to the Prometheus configuration:
 yaml
 ```scrape_configs:
   - job_name: 'system_monitor'
     static_configs:
-      - targets: ['localhost:8000']
+      - targets: ['localhost:8080']
 ```
 Afterwards, by importing the Prometheus data source into Grafana, real-time charts can be displayed.
 ——————————————————————————————————————————————————
