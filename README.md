@@ -127,7 +127,7 @@ yaml
 scrape_configs:
   - job_name: 'system_monitor'
     static_configs:
-      - targets: ['localhost:8000']
+      targets: ['localhost:8000']
 之后在 Grafana 中导入 Prometheus 数据源，即可展示实时图表。
 ——————————————————————————————————————————————————
 **更新日志**
