@@ -58,10 +58,10 @@ path: "your_installtion_rootpath"
 
 ✅ 验证部署
 部署完成后，可通过以下方式验证各组件是否正常运行：
-- ## 监控脚本：systemctl status monitor，应显示 active (running)。
-- ## Prometheus：访问 http://目标IP:9090，查看是否能看到 CPU_use_percent 等指标。
-- ## Grafana：访问 http://目标IP:3000，默认用户名/密码为 admin/admin。
-- ## MySQL：mysql -u monitor_user -p -e "SELECT * FROM system_monitor.metrics LIMIT 5;"，应能看到监控数据。
+- 监控脚本：systemctl status monitor，应显示 active (running)。
+- Prometheus：访问 http://目标IP:9090，查看是否能看到 CPU_use_percent 等指标。
+- Grafana：访问 http://目标IP:3000，默认用户名/密码为 admin/admin。
+- MySQL：mysql -u monitor_user -p -e "SELECT * FROM system_monitor.metrics LIMIT 5;"，应能看到监控数据。
 
 ——————————————————————————————————————————————————————————————————————————————————————————————————————————————
 Ansible one-click deployment monitoring system
@@ -115,7 +115,7 @@ path: "your_installtion_rootpath"
 ```
 ✅ Verify deployment
 After deployment is complete, you can verify whether each component is operating normally by the following methods:
-- ## Monitoring script: systemctl status monitor should display "active (running)".
-- ## Prometheus: Access http://target_IP:9090 to check if metrics such as CPU_use_percent are visible.
-- ## Grafana: Access http://target_IP:3000, with default username/password as admin/admin.
-- ## MySQL: mysql -u monitor_user -p -e "SELECT * FROM system_monitor.metrics LIMIT 5;"，You should be able to see the monitoring data.
+- Monitoring script: systemctl status monitor should display "active (running)".
+- Prometheus: Access http://target_IP:9090 to check if metrics such as CPU_use_percent are visible.
+- Grafana: Access http://target_IP:3000, with default username/password as admin/admin.
+- MySQL: mysql -u monitor_user -p -e "SELECT * FROM system_monitor.metrics LIMIT 5;"，You should be able to see the monitoring data.
