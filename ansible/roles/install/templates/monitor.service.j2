@@ -1,12 +1,15 @@
 # 将脚本封装为服务项
-
 [Unit]
 Description=System Monitor
 After=network.target
 
 [Service]
-ExecStart=/root/Simple-system-detection-and-alerting---Linux/monitor.py
+Type=simple
+ExecStart=/usr/bin/python3 /{{path}}/Simple-system-detection-and-alerting---Linux/monitor.py
+WorkingDirectory=/{{path}}/Simple-system-detection-and-alerting---Linux
 Restart=always
+User=root
+Group=root
 
 [Install]
 WantedBy=multi-user.target
