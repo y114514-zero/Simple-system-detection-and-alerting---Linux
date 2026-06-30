@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: node-monitor
+  namespace: monitoring
+  labels:
+    app: node-monitor
+spec:
+  selector:
+    matchLabels:
+      app: node-monitor
+  template:
+    metadata:
+      labels:
+        app: node-monitor
+    spec:
+      hostAliases:
+      - ip: "117.135.156.58"
+        hostnames:
+        - "qyapi.weixin.qq.com"
+      - ip: "183.204.64.100"   # 替换为实际可达 IP
+        hostnames:
+        - "api.deepseek.com"
+
+      containers:
+      - name: monitor
+        image: 192.168.89.102/monitor/monitor:v3
+        imagePullPolicy: Always
+        volumeMounts:
+        - name: proc
+          mountPath: /host/proc
+          readOnly: true
+        - name: sys
+          mountPath: /host/sys
+          readOnly: true
+        - name: rootfs
+          mountPath: /host
+          readOnly: true
+        ports:
+        - containerPort: 8000
+          name: metrics
+        envFrom:                          # 注入 ConfigMap 和 Secret 的环境变量
+        - configMapRef:
+            name: monitor-config
+        - secretRef:
+            name: monitor-secret
+        securityContext:
+          privileged: true                # 必须特权模式才能读取宿主机的 /proc 和 /sys
+      volumes:
+      - name: proc
+        hostPath:
+          path: /proc
+      - name: sys
+        hostPath:
+          path: /sys
+      - name: rootfs
+        hostPath:
+          path: /
+      tolerations:                        # 允许调度到所有节点（包括 master，如果需要）
+      - operator: Exists

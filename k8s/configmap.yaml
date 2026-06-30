@@ -1,0 +1,19 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: monitor-config
+  namespace: monitoring
+data:
+# 硬件阈值
+  CPU_MAXUSE: "80"        
+  MEMORY_MAXUSE: "90"
+  DISK_MAXUSE: "80"
+# 间隔
+  INTERVAL: "3"
+  ALTER_INTERVAL: "5"
+  DISK_PATH: "/"
+  LOG_PATH: "/dev/stdout"   # 输出地址
+  MYSQL_HOST: "mysql-service"      # 集群内 MySQL Service 名称，若外部则填 IP
+  MYSQL_PORT: "3306"
+  MYSQL_USER: "monitorer"
+  MYSQL_DB: "system_monitor"

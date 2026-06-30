@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: node-monitor
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack        # 根据你的 Prometheus Operator 标签调整
+spec:
+  selector:
+    matchLabels:
+      app: node-monitor
+  namespaceSelector:
+    matchNames:
+      - monitoring
+  endpoints:
+  - port: metrics
+    interval: 15s
