@@ -1,5 +1,0 @@
-- name: restart monitor
-  service:
-    name: monitor
-    state: restarted
-    enabled: yes
